@@ -1,0 +1,83 @@
+body {
+    background-color: #EC911C;
+    color: #1D4265 !important;
+}
+
+.nav-link {
+    font-family: 'Oswald', sans-serif;
+    font-size: 24px;
+    color: #F0C23C;
+    text-transform: uppercase;
+
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+.completed {
+    text-decoration: line-through;
+}
+
+.active {
+    color: #1D4265 !important;
+}
+
+.centered-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding-top: 50px; /* optional: to give some space from the top */
+}
+
+.list {
+    width: 500px;
+    background-color: #F0C23C;
+    min-height: 300px;
+    position: relative;
+    border-radius: 10px;
+}
+
+.container.list-items {
+    margin-bottom: 75px;
+}
+
+.todo-item {
+    padding: 20px;
+    border-bottom: 1px solid #1D4265;
+    font-size: 20px;
+    max-height: 60px;
+    display: flex;
+    align-items: center; /* This vertically aligns all child items in the middle. */    
+}
+
+.btn-close {
+    margin-left: auto; /* This will push the button to the far right of the .todo-item div */
+}
+
+/* div.list-items {
+    margin-bottom: 75px;
+} */
+
+.container.position-absolute {
+    left: 50%;  /* center the container */
+    transform: translateX(-50%);  /* adjust for its own width to truly center it */
+    bottom: 5% !important;  /* adjust distance from bottom as needed */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* for spacing between input and button, adjust as needed */
+}
+
+#todo-input {
+    height: 50px;
+    font-size: 20px;
+    border: none;
+}
+
+#add-todo {
+    height: 50px;
+    font-size: 20px;
+    border: none;
+    border-radius: 25%;
+}
+

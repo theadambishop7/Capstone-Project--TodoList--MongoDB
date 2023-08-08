@@ -1,0 +1,22 @@
+<%- include('partials/header.ejs') -%>
+<div class="container d-flex justify-content-center mb-3">
+    <h1>Todo List</h1>
+</div>
+<div class="container d-flex flex-column position-relative list py-3 px-4">
+    <h2><%= name %></h2>
+        <div class="container list-items">
+        <!--for each item in todo list show the to-do list item and show checked off or not-->
+            <% todoList.forEach(function(todo, index){ %>
+                <div class="todo-item d-flex">
+                    <input type="checkbox" data-id="<%= index %>" <% if(todo.completed) { %> checked <% } %> class="todo-checkbox">
+                    <span class="todo-name px-3"><%= todo.item %></span>
+                    <button class="btn btn-close d-none" data-id="<%= index %>"></button>
+                </div>
+            <% }); %>
+        </div>
+    <div class="container position-absolute">
+        <input type="text" class="form-control mx-2" id="todo-input" placeholder="Add a new todo">
+        <button class="btn btn-primary btn-lg" id="add-todo">+</button>
+    </div>
+</div>
+<%- include('partials/footer.ejs') %>
