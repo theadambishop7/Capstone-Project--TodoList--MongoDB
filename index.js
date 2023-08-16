@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
+import mongoose from 'mongoose';
 
 const app = express();
 const port = 3000;
