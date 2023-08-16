@@ -24,7 +24,10 @@ const todoSchema = new mongoose.Schema({
 
 const Personal = mongoose.model('personalItems', todoSchema);
 const Work = mongoose.model('workItems', todoSchema);
-
+const collections = {
+    Personal: Personal,
+    Work: Work
+  };
 
 const validateTodo = [
     body('listName').isString().withMessage('List name must be a string'),
@@ -53,11 +56,7 @@ app.get("/work", (req, res) => {
 
 app.post('/update-todo', (req, res) => {
     var { todoId, completedStatus, listName } = req.body;
-    if (listName === "Personal") {
-        var dbCall = Personal.findById(todoId)
-    } else if (listName === "Work") {
-        var dbCall = Work.findById(todoId)
-    }
+    var dbCall = collections[listName].findById(todoId);
 
     dbCall.then((todo) => {
         todo.completed = completedStatus;
@@ -75,69 +74,38 @@ app.post('/add-todo', validateTodo, (req, res) => {
     } else {
         var { listName, todoName } = req.body;
     }
-    if (listName === "Personal") {
-        const newTodo = new Personal({
+    const workingCollection = collections[listName];    
+    const newTodo = new workingCollection({
             item: todoName,
             completed: false
         });
-        newTodo.save().then(() => {
-            Personal.find({}).then((items) => {
-                var personalTodoList = items;
-                res.json({ success: true, updatedList: personalTodoList });
-            }).catch((err) => {
-                console.log(err);
-            });
+    newTodo.save().then(() => {
+        workingCollection.find({}).then((items) => {
+            var activeTodoList = items;
+            res.json({ success: true, updatedList: activeTodoList });
         }).catch((err) => {
             console.log(err);
         });
-    } else if (listName === "Work") {
-        const newTodo = new Work({
-            item: todoName,
-            completed: false
-        });
-        newTodo.save().then(() => {
-            Work.find({}).then((items) => {
-                var workTodoList = items;
-                res.json({ success: true, updatedList: workTodoList });
-            }).catch((err) => {
-                console.log(err);
-            }
-            );
         }).catch((err) => {
             console.log(err);
         });
-    }
 });
 
 app.post('/delete-todo', (req, res) => {
     var { todoId, listName } = req.body;
-    if(listName === "Personal") {
-        Personal.findByIdAndDelete(todoId).then((todo) => {
-            console.log("Deleted todo:", todo);
-            Personal.find({}).then((items) => {
-                var personalTodoList = items;
-                res.json({ success: true, updatedList: personalTodoList });
+    const workingCollection = collections[listName];
+    workingCollection.findByIdAndDelete(todoId).then((todo) => {
+        console.log("Deleted todo:", todo);
+        workingCollection.find({}).then((items) => {
+            var activeTodoList = items;
+                res.json({ success: true, updatedList: activeTodoList });
             }).catch((err) => {
                 console.log(err);
             });
         }).catch((err) => {
             console.log(err);
         });
-    } else if(listName === "Work") {
-        Work.findByIdAndDelete(todoId).then((todo) => {
-            console.log("Deleted todo:", todo);
-            Work.find({}).then((items) => {
-                var workTodoList = items;
-                res.json({ success: true, updatedList: workTodoList });
-            }).catch((err) => {
-                console.log(err);
-            }
-            );
-        }).catch((err) => {
-            console.log(err);
-        }
-        );
-    }
+
 });
 
 
