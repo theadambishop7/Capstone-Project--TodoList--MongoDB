@@ -9,6 +9,8 @@ if(currentPath === "/") {
     $(".nav-link[href='/']").addClass("active");
 } else if(currentPath === "/work") {
     $(".nav-link[href='/work']").addClass("active");
+} else {
+    $(".nav-link.custom").addClass("active");
 }
 
 // Function to set the 'completed' class based on checkbox state
@@ -38,7 +40,7 @@ $(document).on('mouseenter', 'div.todo-item', function() {
 // When clicking the delete button, remove the todo item
 $(document).on('click', 'div.todo-item button', function() {
     const todoId = $(this).data('id');
-    const listName = $("h2").text();
+    const listName = $("h2").data("attribute");
 
     $.ajax({
         url: '/delete-todo',
@@ -91,7 +93,7 @@ $(document).on('change', "input[type='checkbox']", function() {
     // Send an AJAX request to the server
     const todoId = $(this).data('id');
     const completedStatus = $(this).is(":checked");
-    const listName = $("h2").text();
+    const listName = $("h2").data("attribute");
 
     $.ajax({
         url: '/update-todo',
@@ -115,9 +117,10 @@ $(document).on('change', "input[type='checkbox']", function() {
 });
 
 $(document).on('click', "button#add-todo", function() {
-    const listName = $("h2").text();
+    const listName = $("h2").data("attribute");
     const todoName = $("input#todo-input").val();
 
+    console.log(listName);
     $.ajax({
         url: '/add-todo',
         method: 'POST',

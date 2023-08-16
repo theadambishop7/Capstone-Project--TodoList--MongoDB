@@ -21,13 +21,12 @@ const todoSchema = new mongoose.Schema({
     completed: Boolean
 });
 
+const listSchema = new mongoose.Schema({
+    name: String,
+    items: [todoSchema]
+});
 
-const Personal = mongoose.model('personalItems', todoSchema);
-const Work = mongoose.model('workItems', todoSchema);
-const collections = {
-    Personal: Personal,
-    Work: Work
-  };
+const List = mongoose.model('list', listSchema);
 
 const validateTodo = [
     body('listName').isString().withMessage('List name must be a string'),
@@ -36,76 +35,138 @@ const validateTodo = [
 
 
 app.get("/", (req, res) => {
-    Personal.find({}).then((items) => {
-        var personalTodoList = items;
-        res.render("index.ejs", { name: "Personal", todoList: personalTodoList });
+    List.findOne({ name: "personal" }).then((list) => {
+        if (list) {
+            //show existing list
+            res.render("index.ejs", { name: list.name, todoList: list.items });
+        } else {
+            //create new list
+            const list = new List({
+                name: "personal",
+            });
+            
+            list.save().then(() => {
+                res.render("index.ejs", { name: list.name, todoList: list.items });
+            }).catch((err) => {
+                console.log(err);
+            });
+        }
     }).catch((err) => {
         console.log(err);
     });
 });
 
-app.get("/work", (req, res) => {
-    Work.find({}).then((items) => {
-        var workTodoList = items;
-        res.render("index.ejs", { name: "Work", todoList: workTodoList });
-    }).catch((err) => {
-        console.log(err);
-    }
-    );
-});
+// app.get("/work", (req, res) => {
+//     Work.find({}).then((items) => {
+//         var workTodoList = items;
+//         res.render("index.ejs", { name: "Work", todoList: workTodoList });
+//     }).catch((err) => {
+//         console.log(err);
+//     }
+//     );
+// });
 
 app.post('/update-todo', (req, res) => {
-    var { todoId, completedStatus, listName } = req.body;
-    var dbCall = collections[listName].findById(todoId);
+    const { todoId, completedStatus, listName } = req.body;
 
-    dbCall.then((todo) => {
-        todo.completed = completedStatus;
-        todo.save();
-        res.json({ success: true });
-    }).catch((err) => {
+    List.findOne({ name: listName }).then(list => {
+        if (list) {
+            const todo = list.items.id(todoId);
+            if (todo) {
+                todo.completed = completedStatus;
+                list.save().then(() => {
+                    res.json({ success: true });
+                });
+            } else {
+                res.json({ success: false, message: 'Todo not found' });
+            }
+        } else {
+            console.log("Error: Invalid list name");
+            res.json({ success: false, message: "Invalid list name" });
+        }
+    }).catch(err => {
         console.log(err);
+        res.json({ success: false, message: "Error updating todo" });
     });
 });
 
 app.post('/add-todo', validateTodo, (req, res) => {
+    const { listName, todoName } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(422).json({ success: false, errors: errors.array() });
+        return res.status(422).json({ success: false, message: errors.array() });
     } else {
-        var { listName, todoName } = req.body;
+        List.findOne({ name: listName }).then(list => {
+            if (list) {
+                list.items.push({ item: todoName, completed: false });
+                list.save().then(() => {
+                    List.findOne({ name: listName }).then(list => {
+                        res.json({ success: true, updatedList: list.items });
+                    });
+                });
+            } else {
+                console.log("Error: Invalid list name");
+                res.json({ success: false, message: "Invalid list name" });
+            }
+        }).catch(err => {
+            console.log(err);
+            res.json({ success: false, message: "Error adding todo" });
+        });
     }
-    const workingCollection = collections[listName];    
-    const newTodo = new workingCollection({
-            item: todoName,
-            completed: false
-        });
-    newTodo.save().then(() => {
-        workingCollection.find({}).then((items) => {
-            var activeTodoList = items;
-            res.json({ success: true, updatedList: activeTodoList });
-        }).catch((err) => {
-            console.log(err);
-        });
-        }).catch((err) => {
-            console.log(err);
-        });
 });
 
+
+
+
 app.post('/delete-todo', (req, res) => {
-    var { todoId, listName } = req.body;
-    const workingCollection = collections[listName];
-    workingCollection.findByIdAndDelete(todoId).then((todo) => {
-        console.log("Deleted todo:", todo);
-        workingCollection.find({}).then((items) => {
-            var activeTodoList = items;
-                res.json({ success: true, updatedList: activeTodoList });
+    const { todoId, listName } = req.body;
+    List.findOne({ name: listName }).then(list => {
+        if (list) {
+            // Remove the todo by filtering out the item with the specified id
+            list.items = list.items.filter(item => item.id !== todoId);
+            list.save().then(() => {
+                List.findOne({ name: listName }).then(list => {
+                    res.json({ success: true, updatedList: list.items });
+
+                }).catch(err => {
+                    console.log(err);
+                    res.json({ success: false, message: "Error deleting todo" });
+                }
+                );
+            });
+        } else {
+            console.log("Error: Invalid list name", list);
+            res.json({ success: false, message: "Invalid list name" });
+        }
+    }).catch(err => {
+        console.log(err);
+        res.json({ success: false, message: "Error deleting todo" });
+    });
+});
+
+
+app.get("/:customListName", (req, res) => {
+    //check if list exists in List collection
+    const customListName = req.params.customListName;
+    List.findOne({ name: customListName }).then((list) => {
+        if (list) {
+            //show existing list
+            res.render("index.ejs", { name: list.name, todoList: list.items });
+        } else {
+            //create new list
+            const list = new List({
+                name: customListName,
+            });
+            
+            list.save().then(() => {
+                res.render("index.ejs", { name: list.name, todoList: list.items });
             }).catch((err) => {
                 console.log(err);
             });
-        }).catch((err) => {
-            console.log(err);
-        });
-
+        }
+    }).catch((err) => {
+        console.log(err);
+    });
 });
 
 
