@@ -144,9 +144,3 @@ app.post('/delete-todo', (req, res) => {
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
-
-function toDoItem(item, completed) {
-    this.item = item;
-    this.completed = completed;
-}
-
