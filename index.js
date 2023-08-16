@@ -2,57 +2,140 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import { body, validationResult } from 'express-validator';
 
+dotenv.config();
 const app = express();
 const port = 3000;
+const uri = process.env.DATABASE_URL + "?retryWrites=true";
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("common"));
 
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+const todoSchema = new mongoose.Schema({
+    item: String,
+    completed: Boolean
+});
+
+const Personal = mongoose.model('personalItems', todoSchema);
+const Work = mongoose.model('workItems', todoSchema);
+
+
+const validateTodo = [
+    body('listName').isString().withMessage('List name must be a string'),
+    body('todoName').isString().withMessage('Todo name must be a string')
+  ];
+
+
 app.get("/", (req, res) => {
-    res.render("index.ejs", { name: "Personal", todoList: personalTodoList });
+    Personal.find({}).then((items) => {
+        var personalTodoList = items;
+        res.render("index.ejs", { name: "Personal", todoList: personalTodoList });
+    }).catch((err) => {
+        console.log(err);
+    });
 });
 
 app.get("/work", (req, res) => {
-    res.render("index.ejs", { name: "Work", todoList: workTodoList });
+    Work.find({}).then((items) => {
+        var workTodoList = items;
+        res.render("index.ejs", { name: "Work", todoList: workTodoList });
+    }).catch((err) => {
+        console.log(err);
+    }
+    );
 });
 
 app.post('/update-todo', (req, res) => {
     var { todoId, completedStatus, listName } = req.body;
-    if (completedStatus === 'true') {
-        completedStatus = true;
-    } else {
-        completedStatus = false;
+    if (listName === "Personal") {
+        var dbCall = Personal.findById(todoId)
+    } else if (listName === "Work") {
+        var dbCall = Work.findById(todoId)
     }
-    if(listName === "Personal") {
-        personalTodoList[todoId].completed = completedStatus;
-    } else if(listName === "Work") {
-        workTodoList[todoId].completed = completedStatus;
-    }
-    
-    res.json({ success: true });
+
+    dbCall.then((todo) => {
+        todo.completed = completedStatus;
+        todo.save();
+        res.json({ success: true });
+    }).catch((err) => {
+        console.log(err);
+    });
 });
 
-app.post('/add-todo', (req, res) => {
-    var { listName, todoName } = req.body;
-    if(listName === "Personal") {
-        personalTodoList.push(new toDoItem(todoName, false));
-        res.json({ success: true, updatedList: personalTodoList });
-    } else if(listName === "Work") {
-        workTodoList.push(new toDoItem(todoName, false));
-        res.json({ success: true, updatedList: workTodoList });
+app.post('/add-todo', validateTodo, (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ success: false, errors: errors.array() });
+    } else {
+        var { listName, todoName } = req.body;
+    }
+    if (listName === "Personal") {
+        const newTodo = new Personal({
+            item: todoName,
+            completed: false
+        });
+        newTodo.save().then(() => {
+            Personal.find({}).then((items) => {
+                var personalTodoList = items;
+                res.json({ success: true, updatedList: personalTodoList });
+            }).catch((err) => {
+                console.log(err);
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
+    } else if (listName === "Work") {
+        const newTodo = new Work({
+            item: todoName,
+            completed: false
+        });
+        newTodo.save().then(() => {
+            Work.find({}).then((items) => {
+                var workTodoList = items;
+                res.json({ success: true, updatedList: workTodoList });
+            }).catch((err) => {
+                console.log(err);
+            }
+            );
+        }).catch((err) => {
+            console.log(err);
+        });
     }
 });
 
 app.post('/delete-todo', (req, res) => {
     var { todoId, listName } = req.body;
     if(listName === "Personal") {
-        personalTodoList.splice(todoId, 1);
-        res.json({ success: true, updatedList: personalTodoList });
+        Personal.findByIdAndDelete(todoId).then((todo) => {
+            console.log("Deleted todo:", todo);
+            Personal.find({}).then((items) => {
+                var personalTodoList = items;
+                res.json({ success: true, updatedList: personalTodoList });
+            }).catch((err) => {
+                console.log(err);
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
     } else if(listName === "Work") {
-        workTodoList.splice(todoId, 1);
-        res.json({ success: true, updatedList: workTodoList });
+        Work.findByIdAndDelete(todoId).then((todo) => {
+            console.log("Deleted todo:", todo);
+            Work.find({}).then((items) => {
+                var workTodoList = items;
+                res.json({ success: true, updatedList: workTodoList });
+            }).catch((err) => {
+                console.log(err);
+            }
+            );
+        }).catch((err) => {
+            console.log(err);
+        }
+        );
     }
 });
 
@@ -66,5 +149,3 @@ function toDoItem(item, completed) {
     this.completed = completed;
 }
 
-var personalTodoList = [new toDoItem("Buy milk", false), new toDoItem("Buy eggs", true), new toDoItem("Buy bread", false)];
-var workTodoList = [new toDoItem("Do work", false), new toDoItem("Get Raise", false), new toDoItem("Quit", false)];

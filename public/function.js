@@ -56,16 +56,16 @@ $(document).on('click', 'div.todo-item button', function() {
                 $(".todo-item").remove();
 
                 // Append the updated todo list
-                response.updatedList.forEach(function(todo, index) {
+                response.updatedList.forEach(function(todo) {
                     const isChecked = todo.completed ? 'checked' : '';
                     const todoDiv = `
                         <div class="todo-item">
-                            <input type="checkbox" data-id="${index}" ${isChecked} class="todo-checkbox">
+                            <input type="checkbox" data-id="${todo._id}" ${isChecked} class="todo-checkbox">
                             <span class="todo-name px-3">${todo.item}</span>
-                            <button class="btn btn-close d-none" data-id="${index}"></button>
+                            <button class="btn btn-close d-none" data-id="${todo._id}"></button>
                         </div>`;
                     $(".list-items").append(todoDiv);
-                    checkCheckboxState($(`input[data-id='${index}']`));
+                    checkCheckboxState($(`input[data-id='${todo._id}']`));
                 });
 
             } else {
@@ -134,16 +134,16 @@ $(document).on('click', "button#add-todo", function() {
                 $("input#todo-input").val("");
 
                 // Append the updated todo list
-                response.updatedList.forEach(function(todo, index) {
+                response.updatedList.forEach(function(todo) {
                     const isChecked = todo.completed ? 'checked' : '';
                     const todoDiv = `
                         <div class="todo-item">
-                            <input type="checkbox" data-id="${index}" ${isChecked} class="todo-checkbox">
+                            <input type="checkbox" data-id="${todo._id}" ${isChecked} class="todo-checkbox">
                             <span class="todo-name px-3">${todo.item}</span>
-                            <button class="btn btn-close d-none" data-id="${index}"></button>
+                            <button class="btn btn-close d-none" data-id="${todo._id}"></button>
                         </div>`;
                     $(".list-items").append(todoDiv);
-                    checkCheckboxState($(`input[data-id='${index}']`));
+                    checkCheckboxState($(`input[data-id='${todo._id}']`));
                 });
                 
 

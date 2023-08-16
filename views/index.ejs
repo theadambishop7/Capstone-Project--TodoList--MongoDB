@@ -6,11 +6,11 @@
     <h2><%= name %></h2>
         <div class="container list-items">
         <!--for each item in todo list show the to-do list item and show checked off or not-->
-            <% todoList.forEach(function(todo, index){ %>
+            <% todoList.forEach(function(todo){ %>
                 <div class="todo-item d-flex">
-                    <input type="checkbox" data-id="<%= index %>" <% if(todo.completed) { %> checked <% } %> class="todo-checkbox">
+                    <input type="checkbox" data-id="<%= todo._id %>" <% if(todo.completed) { %> checked <% } %> class="todo-checkbox">
                     <span class="todo-name px-3"><%= todo.item %></span>
-                    <button class="btn btn-close d-none" data-id="<%= index %>"></button>
+                    <button class="btn btn-close d-none" data-id="<%= todo._id %>"></button>
                 </div>
             <% }); %>
         </div>
