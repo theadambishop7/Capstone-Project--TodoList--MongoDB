@@ -7,10 +7,9 @@ $(".nav-link").removeClass("active");
 // Add the active class to the appropriate nav-link based on the path
 if(currentPath === "/") {
     $(".nav-link[href='/']").addClass("active");
-} else if(currentPath === "/work") {
-    $(".nav-link[href='/work']").addClass("active");
 } else {
-    $(".nav-link.custom").addClass("active");
+    var customRoute = currentPath.replace(/^\//, '');
+    $(`.nav-link[data-id=${customRoute}]`).addClass("active");
 }
 
 // Function to set the 'completed' class based on checkbox state

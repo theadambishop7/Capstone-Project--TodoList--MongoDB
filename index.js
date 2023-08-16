@@ -12,7 +12,7 @@ const uri = process.env.DATABASE_URL + "?retryWrites=true";
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(morgan("common"));
+app.use(morgan("short"));
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -35,36 +35,31 @@ const validateTodo = [
 
 
 app.get("/", (req, res) => {
-    List.findOne({ name: "personal" }).then((list) => {
-        if (list) {
-            //show existing list
-            res.render("index.ejs", { name: list.name, todoList: list.items });
-        } else {
-            //create new list
-            const list = new List({
-                name: "personal",
-            });
-            
-            list.save().then(() => {
-                res.render("index.ejs", { name: list.name, todoList: list.items });
-            }).catch((err) => {
-                console.log(err);
-            });
-        }
+    List.find({}).then((lists) => {
+        List.findOne({ name: "personal" }).then((list) => {
+            if (list) {
+                //show existing list
+                res.render("index.ejs", { lists: lists, name: list.name, todoList: list.items });
+            } else {
+                //create new list
+                const list = new List({
+                    name: "personal",
+                });
+                
+                list.save().then(() => {
+                    res.render("index.ejs", { lists: lists, name: list.name, todoList: list.items });
+                }).catch((err) => {
+                    console.log(err);
+                });
+            }
+        }).catch((err) => {
+            console.log(err);
+        });
     }).catch((err) => {
         console.log(err);
-    });
+    }
+    );
 });
-
-// app.get("/work", (req, res) => {
-//     Work.find({}).then((items) => {
-//         var workTodoList = items;
-//         res.render("index.ejs", { name: "Work", todoList: workTodoList });
-//     }).catch((err) => {
-//         console.log(err);
-//     }
-//     );
-// });
 
 app.post('/update-todo', (req, res) => {
     const { todoId, completedStatus, listName } = req.body;
@@ -148,26 +143,24 @@ app.post('/delete-todo', (req, res) => {
 app.get("/:customListName", (req, res) => {
     //check if list exists in List collection
     const customListName = req.params.customListName;
-    List.findOne({ name: customListName }).then((list) => {
-        if (list) {
-            //show existing list
-            res.render("index.ejs", { name: list.name, todoList: list.items });
-        } else {
-            //create new list
-            const list = new List({
-                name: customListName,
-            });
-            
-            list.save().then(() => {
-                res.render("index.ejs", { name: list.name, todoList: list.items });
-            }).catch((err) => {
-                console.log(err);
-            });
+    List.find({}).then((lists) => {
+        List.findOne({ name: customListName }).then((list) => {
+            if (list) {
+                //show existing list
+                res.render("index.ejs", { lists: lists, name: list.name, todoList: list.items });
+            } else {
+                console.log("List not found");
+                res.redirect("/");            
+            }
+        }).catch((err) => {
+            console.log(err);
         }
+        );
     }).catch((err) => {
         console.log(err);
     });
 });
+
 
 
 app.listen(port, () => {
