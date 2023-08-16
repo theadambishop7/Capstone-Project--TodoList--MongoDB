@@ -21,6 +21,7 @@ const todoSchema = new mongoose.Schema({
     completed: Boolean
 });
 
+
 const Personal = mongoose.model('personalItems', todoSchema);
 const Work = mongoose.model('workItems', todoSchema);
 
