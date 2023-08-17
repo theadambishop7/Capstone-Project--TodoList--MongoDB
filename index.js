@@ -65,17 +65,11 @@ app.get("/", (req, res) => {
 app.post('/update-todo', (req, res) => {
     const { todoId, completedStatus, listName } = req.body;
 
-    List.findOne({ name: listName }).then(list => {
+    List.findOneAndUpdate({ name: listName, "items._id": todoId }, 
+    { $set: { "items.$.completed": completedStatus } },
+    { new: true }).then(list => {
         if (list) {
-            const todo = list.items.id(todoId);
-            if (todo) {
-                todo.completed = completedStatus;
-                list.save().then(() => {
-                    res.json({ success: true });
-                });
-            } else {
-                res.json({ success: false, message: 'Todo not found' });
-            }
+            res.json({ success: true });
         } else {
             console.log("Error: Invalid list name");
             res.json({ success: false, message: "Invalid list name" });
