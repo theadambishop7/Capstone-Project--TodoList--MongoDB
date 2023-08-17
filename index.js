@@ -91,6 +91,9 @@ app.post('/add-todo', validateTodo, (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ success: false, message: errors.array() });
+    } else if (todoName === "") {
+        console.log("Todo name cannot be empty");
+        res.json({ success: false, message: "Todo name cannot be empty" });
     } else {
         List.findOne({ name: listName }).then(list => {
             if (list) {
