@@ -88,7 +88,6 @@ app.post('/update-todo', (req, res) => {
 
 app.post('/add-todo', validateTodo, (req, res) => {
     const { listName, todoName } = req.body;
-    console.log(listName, todoName);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ success: false, message: errors.array() });
