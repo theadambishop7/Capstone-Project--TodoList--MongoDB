@@ -146,6 +146,10 @@ app.post("/add-list", (req, res) => {
             console.log("List already exists");
             res.json({ success: false, message: "List already exists" });
             return;
+        } else if (listName === "") {
+            console.log("List name cannot be empty");
+            res.json({ success: false, message: "List name cannot be empty" });
+            return;
         } else {
             const list = new List({
                 name: listName,
