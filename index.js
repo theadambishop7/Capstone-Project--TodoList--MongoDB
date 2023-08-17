@@ -8,13 +8,13 @@ import { body, validationResult } from 'express-validator';
 dotenv.config();
 const app = express();
 const port = 3000;
-const uri = process.env.DATABASE_URL + "?retryWrites=true";
+const uri = process.env.DATABASE_URL;
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("short"));
 
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(`${uri}?retryWrites=true`, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const todoSchema = new mongoose.Schema({
     item: String,

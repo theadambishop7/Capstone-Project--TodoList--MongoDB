@@ -1,14 +1,81 @@
-body {
+/* body {
     background-color: #EC911C;
     color: #1D4265 !important;
+    background-image: -webkit-linear-gradient(65deg, #EC911C 50%, #ffea74 50%);
+    min-height: 1000px !important;
+} */
+
+body {
+    margin: auto;
+    overflow: auto;
+    background: #F6635C;
+    background-size: 400% 400%;
+    background-attachment: fixed;
+}
+
+h1 {
+    color: #FFBA86;
+}
+
+h2 {
+    color: #F6635C;
+}
+
+.wave {
+    background: rgb(194 51 115 / 33%);
+    border-radius: 1000% 1000% 0 0;
+    position: fixed;
+    width: 200%;
+    height: 20em;
+    animation: wave 10s -3s linear infinite;
+    transform: translate3d(0, 0, 0);
+    opacity: 0.8;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.wave:nth-of-type(2) {
+    bottom: -3.25em;
+    animation: wave 18s linear reverse infinite;
+    opacity: 0.8;
+}
+
+.wave:nth-of-type(3) {
+    bottom: -5.5em;
+    animation: wave 20s -1s reverse infinite;
+    opacity: 0.9;
+}
+
+@keyframes wave {
+    2% {
+        transform: translateX(1);
+    }
+
+    25% {
+        transform: translateX(-25%);
+    }
+
+    50% {
+        transform: translateX(-50%);
+    }
+
+    75% {
+        transform: translateX(-25%);
+    }
+
+    100% {
+        transform: translateX(1);
+    }
 }
 
 .nav-link {
-    font-family: 'Oswald', sans-serif;
     font-size: 24px;
-    color: #F0C23C;
-    text-transform: uppercase;
+    color: #FFBA86;
+}
 
+.nav-link:hover {
+    color: #C23373;
 }
 
 input[type="checkbox"] {
@@ -21,7 +88,15 @@ input[type="checkbox"] {
 }
 
 .active {
-    color: #1D4265 !important;
+    color: #79155B !important;
+}
+
+/* .modal-content {
+} */
+
+.modal-title {
+    color: #dc3545;
+    font-size: 24px;
 }
 
 .centered-container {
@@ -32,7 +107,7 @@ input[type="checkbox"] {
 
 .list {
     width: 500px;
-    background-color: #F0C23C;
+    background-color: #FFBA86;
     min-height: 300px;
     position: relative;
     border-radius: 10px;
@@ -62,10 +137,10 @@ input[type="checkbox"] {
 .container.position-absolute {
     left: 50%;  /* center the container */
     transform: translateX(-50%);  /* adjust for its own width to truly center it */
-    bottom: 5% !important;  /* adjust distance from bottom as needed */
+    bottom: 25px !important;  /* adjust distance from bottom as needed */
     display: flex;
     align-items: center;
-    gap: 10px; /* for spacing between input and button, adjust as needed */
+    gap: 5px; /* for spacing between input and button, adjust as needed */
 }
 
 #todo-input {

@@ -118,8 +118,7 @@ $(document).on('change', "input[type='checkbox']", function() {
 $(document).on('click', "button#add-todo", function() {
     const listName = $("h2").data("attribute");
     const todoName = $("input#todo-input").val();
-
-    console.log(listName);
+    
     $.ajax({
         url: '/add-todo',
         method: 'POST',
@@ -129,7 +128,7 @@ $(document).on('click', "button#add-todo", function() {
         },
         success: function(response) {
             if(response.success) {
-                console.log("Todo updated successfully!");
+                console.log("Todo added successfully!");
 
                 // Clear current todo list
                 $(".todo-item").remove();
