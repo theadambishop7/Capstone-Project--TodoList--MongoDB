@@ -23,7 +23,14 @@
                 <% } %>
               <% }); %>
           </ul>
-
-          </div>
+          <form>
+            <div class="d-flex mx-2 add-list">
+              <input id="add-list-input" type="text" class="form-control mx-2" aria-describedby="add-list-feedback" placeholder="Add a new list">
+              <button id="add-list-button" class="btn btn-outline-light btn-lg custom-button">+</button>
+              
+            </div>
+            <div id="add-list-feedback" class="invalid-feedback">
+            List Name already exists!</div>
+          </form>
         </div>
       </header>

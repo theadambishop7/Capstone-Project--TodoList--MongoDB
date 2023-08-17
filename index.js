@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
+import _ from 'lodash';
 
 dotenv.config();
 const app = express();
@@ -87,6 +88,7 @@ app.post('/update-todo', (req, res) => {
 
 app.post('/add-todo', validateTodo, (req, res) => {
     const { listName, todoName } = req.body;
+    console.log(listName, todoName);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ success: false, message: errors.array() });
@@ -109,8 +111,6 @@ app.post('/add-todo', validateTodo, (req, res) => {
         });
     }
 });
-
-
 
 
 app.post('/delete-todo', (req, res) => {
@@ -139,6 +139,30 @@ app.post('/delete-todo', (req, res) => {
     });
 });
 
+app.post("/add-list", (req, res) => {
+    let listName = req.body.listName;
+    listName = _.kebabCase(listName);
+    List.find({name: listName}).then((result) => {
+        if (result.length > 0) {
+            console.log("List already exists");
+            res.json({ success: false, message: "List already exists" });
+            return;
+        } else {
+            const list = new List({
+                name: listName,
+            });
+            list.save().then(() => {
+                res.json({ success: true, listName: listName });
+            }).catch((err) => {
+                console.log(err);
+            });
+        }
+    }).catch((err) => {
+        console.log(err);
+    }
+    );
+});
+
 
 app.get("/:customListName", (req, res) => {
     //check if list exists in List collection
@@ -161,6 +185,15 @@ app.get("/:customListName", (req, res) => {
     });
 });
 
+app.post("/delete-list", (req, res) => {
+    const listName = req.body.listName;
+    List.deleteOne({ name: listName }).then(() => {
+        console.log("List deleted successfully!");
+        res.redirect("/");
+    }).catch((err) => {
+        console.log(err);
+    });
+});
 
 
 app.listen(port, () => {

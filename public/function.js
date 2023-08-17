@@ -1,5 +1,6 @@
 // Get the current path
 var currentPath = window.location.pathname;
+var customRoute = currentPath.replace(/^\//, '');
 
 // Remove the active class from all nav-links
 $(".nav-link").removeClass("active");
@@ -8,7 +9,6 @@ $(".nav-link").removeClass("active");
 if(currentPath === "/") {
     $(".nav-link[href='/']").addClass("active");
 } else {
-    var customRoute = currentPath.replace(/^\//, '');
     $(`.nav-link[data-id=${customRoute}]`).addClass("active");
 }
 
@@ -28,6 +28,49 @@ $(document).on('keypress', "input#todo-input", function(event) {
         $("button#add-todo").click();
     }
 });
+
+//Detect Keypress Enter on input
+$(document).on('keypress', "input#add-list-input", function(event) {
+    if(event.which === 13) {
+        event.preventDefault();
+        $("button#add-list-button").click();
+    }
+});
+
+//When clicking the add-list button, send an AJAX request to the server
+$(document).on('click', "button#add-list-button", function(event) {
+    const listName = $("input#add-list-input").val().toLowerCase();
+    event.preventDefault();
+
+    $.ajax({
+        url: '/add-list',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        data: {
+            listName: listName
+        },
+        success: function(response) {
+            if(response.success) {
+                console.log("List added successfully!");
+
+                // Redirect to the new list
+                window.location.href = `/${response.listName}`;
+
+            } else {
+                // Display error message
+                $("input#add-list-input").addClass("is-invalid");
+                $("div#add-list-feedback").addClass("show");
+                $("div#add-list-feedback").text(response.message);
+                
+            }
+        },
+        error: function(error) {
+            console.error("An error occurred:", error);
+        }
+    });
+});
+                
+
 
 // When hovering over a todo item, show the delete button
 $(document).on('mouseenter', 'div.todo-item', function() {
@@ -118,7 +161,7 @@ $(document).on('change', "input[type='checkbox']", function() {
 $(document).on('click', "button#add-todo", function() {
     const listName = $("h2").data("attribute");
     const todoName = $("input#todo-input").val();
-    
+
     $.ajax({
         url: '/add-todo',
         method: 'POST',

@@ -151,8 +151,31 @@ input[type="checkbox"] {
 
 #add-todo {
     height: 50px;
-    font-size: 20px;
-    border: none;
+    font-size: 1.75rem;
     border-radius: 25%;
+    padding: .10rem 1rem .5rem 1rem; /* Adjust padding if needed */
 }
 
+.add-list {
+    height: 40px;
+    width: 300px !important;
+}
+
+input.add-list, button.add-list {
+    height: 100%;
+}
+
+.custom-button {
+    font-size: 1.5rem;
+    line-height: 0;
+    padding: 0.25rem .5rem .5rem .5rem; /* Adjust padding if needed */
+}
+
+.invalid-feedback {
+    margin-left: 1.25rem;
+    color: #79155B;
+}
+
+.show {
+    display: block !important;
+}
