@@ -25,12 +25,12 @@
           </ul>
           <form <% if (lists.length > 5) {%>data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Max Lists Reached."<% };%>>
             <div class="d-flex mx-2 add-list">
-              <input id="add-list-input" type="text" class="form-control mx-2" aria-describedby="add-list-feedback" placeholder="Add a new list" <% if (lists.length > 5){ %>disabled<% }; %>>
+              <input id="add-list-input" type="text" class="form-control mx-2" autocomplete="off" aria-describedby="add-list-feedback" placeholder="Add a new list" <% if (lists.length > 5){ %>disabled<% }; %>>
               <button id="add-list-button" class="btn btn-outline-light btn-lg custom-button" <% if (lists.length > 5){ %>disabled<% }; %>>+</button>
               
             </div>
             <div id="add-list-feedback" class="invalid-feedback">
-            List Name already exists!</div>
+            Error Message</div>
           </form>
         </div>
       </header>

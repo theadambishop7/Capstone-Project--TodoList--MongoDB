@@ -2,6 +2,16 @@ $(document).ready(function(){
     $('[data-bs-toggle="tooltip"]').tooltip();   
 });
 
+let feedbackTimeout;
+
+$("input#add-list-input").on("keydown", function() {
+    clearTimeout(feedbackTimeout);
+    $("div#add-list-feedback").removeClass("show");
+    $("input#add-list-input").removeClass("is-invalid");
+});
+
+
+
 // Get the current path
 var currentPath = window.location.pathname;
 var customRoute = currentPath.replace(/^\//, '');
@@ -45,6 +55,7 @@ $(document).on('keypress', "input#add-list-input", function(event) {
 $(document).on('click', "button#add-list-button", function(event) {
     const listName = $("input#add-list-input").val().toLowerCase();
     event.preventDefault();
+    clearTimeout(feedbackTimeout);
 
     $.ajax({
         url: '/add-list',
@@ -64,6 +75,10 @@ $(document).on('click', "button#add-list-button", function(event) {
                 // Display error message
                 $("input#add-list-input").addClass("is-invalid");
                 $("div#add-list-feedback").addClass("show");
+                feedbackTimeout = setTimeout(function() {
+                    $("div#add-list-feedback").removeClass("show");
+                    $("input#add-list-input").removeClass("is-invalid");
+                }, 5000);
                 $("div#add-list-feedback").text(response.message);
                 
             }
