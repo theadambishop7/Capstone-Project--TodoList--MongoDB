@@ -138,25 +138,41 @@ app.post('/delete-todo', (req, res) => {
 app.post("/add-list", (req, res) => {
     let listName = req.body.listName;
     listName = _.kebabCase(listName);
-    List.find({name: listName}).then((result) => {
-        if (result.length > 0) {
-            console.log("List already exists");
-            res.json({ success: false, message: "List already exists" });
-            return;
-        } else if (listName === "") {
-            console.log("List name cannot be empty");
-            res.json({ success: false, message: "List name cannot be empty" });
+    List.find({}).then((lists) => {
+        if (lists.length > 5) {
+            console.log("Maximum number of lists reached");
+            res.json({ success: false, message: "Maximum number of lists reached" });
             return;
         } else {
-            const list = new List({
-                name: listName,
-            });
-            list.save().then(() => {
-                res.json({ success: true, listName: listName });
-            }).catch((err) => {
-                console.log(err);
-            });
+        List.find({name: listName}).then((result) => {
+            if (result.length > 0) {
+                console.log("List already exists");
+                res.json({ success: false, message: "List already exists" });
+                return;
+            } else if (listName === "") {
+                console.log("List name cannot be empty");
+                res.json({ success: false, message: "List name cannot be empty" });
+                return;
+            } else if (result.length > 5) {
+                console.log("Maximum number of lists reached");
+                res.json({ success: false, message: "Maximum number of lists reached" });
+                return;
+            } else {
+                const list = new List({
+                    name: listName,
+                });
+                list.save().then(() => {
+                    res.json({ success: true, listName: listName });
+                }).catch((err) => {
+                    console.log(err);
+                });
         }
+    }).catch((err) => {
+        console.log(err);
+    }
+    );
+}
+
     }).catch((err) => {
         console.log(err);
     }

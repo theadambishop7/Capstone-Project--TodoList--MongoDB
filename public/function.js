@@ -1,3 +1,7 @@
+$(document).ready(function(){
+    $('[data-bs-toggle="tooltip"]').tooltip();   
+});
+
 // Get the current path
 var currentPath = window.location.pathname;
 var customRoute = currentPath.replace(/^\//, '');
